@@ -1,6 +1,9 @@
-#Tokens#
+#CONSTANTS#
+DIGITS = '01234567890'
 
-TT_INT      = 'INTEGER'
+#TOKENS#
+TT_INT      = 'INT'
+TT_FLOAT    = 'FLOAT'
 TT_STRING   = 'STRING'
 TT_VARIABLE = 'VARIABLE'
 TT_PLUS     = 'PLUS'
@@ -13,84 +16,109 @@ TT_LCURLY   = 'LCURLY'
 TT_RCURLY   = 'RCURLY'
 TT_WHILE    = 'WHILE'
 TT_IF       = 'IF'
-TT_EOF      = 'EOF'
 
-#Token Class#
+#TOKEN CLASS#
 class Token(object):
-    def __init__(self, type, value):
+    def __init__(self, type, value = None):
         self.type = type
         self.value = value
 
-    def __str__(self):
-        return 'Token({type}, {value}'.format(
-            type = self.type,
-            value = repr(self.value)
-        )
+    def __repr__(self) -> str:
+        if self.value: return f'{self.type}:{self.value}'
+        return f'{self.type}'
 
-    def __repr__(self):
-        return self.__str__()
-
-class Interpreter(object):
+#LEXER CLASS#
+class Lexer(object):
     def __init__(self, text):
         self.text = text
-        self.pos = 0
-        self.current_token = None
+        self.pos = -1
+        self.current_char = None
+        self.advance()
 
-    def error(self):
-        raise Exception('Error Parsing input')
-    
-    def get_next_token(self):
-        text = self.text
+    def advance(self):
+        self.pos += 1
+        self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
 
-        if self.pos > len(text) - 1:
-            return Token(TT_EOF, None)
+    def make_tokens(self):
+        tokens = []
+        while self.current_char != None:
+            if self.current_char in ' \t':
+                self.advance()
+            elif self.current_char in DIGITS:
+                tokens.append(self.make_number())
+                self.advance()
+            elif self.current_char == '+':
+                tokens.append(Token(TT_PLUS))
+                self.advance()
+            elif self.current_char == '-':
+                tokens.append(Token(TT_MINUS))
+                self.advance()
+            elif self.current_char == '*':
+                tokens.append(Token(TT_MULTIPLY))
+                self.advance()
+            elif self.current_char == '/':
+                tokens.append(Token(TT_DIVIDE))
+                self.advance()
+            elif self.current_char == '(':
+                tokens.append(Token(TT_LPARAN))
+                self.advance()
+            elif self.current_char == ')':
+                tokens.append(Token(TT_RPARAN))
+                self.advance()
+            elif self.current_char == '{':
+                tokens.append(Token(TT_LCURLY))
+                self.advance()
+            elif self.current_char == '}':
+                tokens.append(Token(TT_RCURLY))
+                self.advance()
+            elif self.current_char == 'if':
+                tokens.append(Token(TT_IF))
+                self.advance()
+            elif self.current_char == 'while':
+                tokens.append(Token(TT_WHILE))
+                self.advance()
+            else:
+                char = self.current_char
+                self.advance()
+                return [], IllegalCharError("'" + char + "'")
 
-        current_char = text[self.pos]
+        return tokens, None
 
-        if current_char.isdigit():
-            token = Token(TT_INT, int(current_char))
-            self.pos += 1
-            return token
-        
-        if current_char == '+':
-            token = Token(TT_PLUS, current_char)
-            self.pos += 1
-            return token
+    def make_number(self):
+        num_str = ''
+        dot_count = 0
 
-        self.error()
+        while self.current_char != None and self.current_char in DIGITS + '.':
+            if self.current_char == '.':
+                if dot_count == 1: break
+                dot_count += 1
+                num_str += '.'
+            else:
+                num_str += self.current_char
+            self.advance()
 
-    def eat(self, token_type):
-        if self.current_token.type == token_type:
-            self.current_token = self.get_next_token()
-        else:
-            self.error()
+            if dot_count == 0:
+                return Token(TT_INT, int(num_str))
+            else:
+                return Token(TT_FLOAT, float(num_str))
 
-    def expr(self):
-        self.current_token = self.get_next_token()
-        left = self.current_token
-        self.eat(TT_INT)
+#ERROR CLASS#
+class Error:
+    def __int__(self, error_name, details):
+        self.error_name = error_name
+        self.details = details
 
-        op = self.current_token
-        self.eat(TT_PLUS)
-
-        right = self.current_token
-        self.eat(TT_INT)
-
-        result = left.value + right.value
+    def as_string(self):
+        result = f'{self.error_name}: {self.details}'
         return result
 
-def main():
-    while True:
-        try:
-            text = input('JavPie > ')
-        except EOFError:
-            break
-        if not text:
-            continue
-        interpreter = Interpreter(text)
-        result = interpreter.expr()
-        print(result)
+class IllegalCharError(Error):
+    def __init__(self, details):
+        super().__init__('Illegal Character', details)
 
+#RUN CLASS#
+def run(text):
+    lexer = Lexer(text)
+    tokens, error = lexer.make_tokens()
 
-if __name__ == '__main__':
-    main()
+    return tokens, error

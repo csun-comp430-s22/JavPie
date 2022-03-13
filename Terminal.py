@@ -1,17 +1,8 @@
-from Tokenizer import Interpreter
+import Tokenizer
 
-def main():
-    while True:
-        try:
-            text = input('JavPie > ')
-        except EOFError:
-            break
-        if not text:
-            continue
-        interpreter = Interpreter(text)
-        result = interpreter.expr()
-        print(result)
+while True:
+    text = input('Javpie > ')
+    result, error = Tokenizer.run(text)
 
-
-if __name__ == '__main__':
-    main()
+    if error: print(error.as_string())
+    else: print(result)
