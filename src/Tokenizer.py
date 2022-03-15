@@ -103,7 +103,7 @@ class Lexer:
 
 #ERROR CLASS#
 class Error:
-    def __int__(self, error_name, details):
+    def __init__(self, error_name, details):
         self.error_name = error_name
         self.details = details
 
