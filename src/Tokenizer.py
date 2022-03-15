@@ -18,9 +18,9 @@ TT_WHILE    = 'WHILE'
 TT_IF       = 'IF'
 
 #TOKEN CLASS#
-class Token(object):
-    def __init__(self, type, value = None):
-        self.type = type
+class Token:
+    def __init__(self, type_, value = None):
+        self.type = type_
         self.value = value
 
     def __repr__(self) -> str:
@@ -28,7 +28,7 @@ class Token(object):
         return f'{self.type}'
 
 #LEXER CLASS#
-class Lexer(object):
+class Lexer:
     def __init__(self, text):
         self.text = text
         self.pos = -1
