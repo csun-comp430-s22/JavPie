@@ -79,7 +79,7 @@ class Lexer:
             else:
                 char = self.current_char
                 self.advance()
-                return [], IllegalCharError("'" + char + "'")
+                return [], IllegalCharError(char)
 
         return tokens, None
 
@@ -101,12 +101,12 @@ class Lexer:
         else:
             return Token(TT_FLOAT, float(num_str))
 
-#ERROR CLASS#
+#ERROR CLASSES#
 class Error:
-    def __int__(self, error_name, details):
+    def __init__(self, error_name, details):
         self.error_name = error_name
         self.details = details
-
+    
     def as_string(self):
         result = f'{self.error_name}: {self.details}'
         return result
