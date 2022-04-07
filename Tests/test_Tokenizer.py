@@ -1,8 +1,6 @@
 import unittest
-import src.Tokenizer as Tokenizer
+import Tokenizer
  
-
-
 class TestTokens(unittest.TestCase):
     def test_run(self):
         test_input = '9+9'
