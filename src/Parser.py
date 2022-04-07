@@ -65,7 +65,7 @@ class Parser:
         if not res.error and self.current_tok.type != Tokenizer.TT_EOF:
             return res.failure(Error.InvalidSyntaxError( 
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected '+', '-', '*', or '/'"
+                "Expected '+', '-', '*', or '/' \n"
             ))
         return res
 
@@ -99,7 +99,7 @@ class Parser:
 
         return res.failure(Error.InvalidSyntaxError(
             tok.pos_start, tok.pos_end,
-            "Expected int or float"
+            "Expected int or float \n"
         ))
 
     def term(self):
