@@ -1,65 +1,115 @@
-import unittest
-import Tokenizer
+import Error
+import Parser
 
-# NOT 100% SURE THIS TEST CASE WILL WORK TRYING TO GET IMPORT TO WORK FOR NOW
-class TestTokens(unittest.TestCase):
-    def test_additions(self):
-        test_input = '1+1'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([INT:1, PLUS, INT:1], None)'
-        self.assertEqual(str(testing), expected_text)
-class TestTokens2(unittest.TestCase):
-    def test_additions(self):
-        test_input = '(3)'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([LPARAN, INT:3, RPARAN], None)'
-        self.assertEqual(str(testing), expected_text)
+#CONSTANTS#
+DIGITS = '0123456789'
 
+#TOKENS#
+TT_INT      = 'INT'
+TT_FLOAT    = 'FLOAT'
+TT_STRING   = 'STRING'
 
-class TestTokens3(unittest.TestCase):
-    def test_additions(self):
-        test_input = '{5}'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([LCURLY, INT:5, RCURLY], None)'
-        self.assertEqual(str(testing), expected_text)
+TT_VARIABLE = 'VARIABLE'
 
-class TestTokens4(unittest.TestCase):
-    def test_additions(self):
-        test_input = '10/2'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([INT:10, DIVIDE, INT:2], None)'
-        self.assertEqual(str(testing), expected_text)
+TT_PLUS     = 'PLUS'
+TT_MINUS    = 'MINUS'
+TT_MULTIPLY = 'MULTIPLY'
+TT_DIVIDE   = 'DIVIDE'
 
-class TestTokens5(unittest.TestCase):
-    def test_additions(self):
-        test_input = '10 * 2'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([INT:10, MULTIPLY, INT:2], None)'
-        self.assertEqual(str(testing), expected_text)
+TT_LPARAN   = 'LPARAN'
+TT_RPARAN   = 'RPARAN'
+TT_LCURLY   = 'LCURLY'
+TT_RCURLY   = 'RCURLY'
 
-class TestTokens6(unittest.TestCase):
-    def test_additions(self):
-        test_input = '+-'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([PLUS, MINUS], None)'
-        self.assertEqual(str(testing), expected_text)
-class TestTokens7(unittest.TestCase):
-    def test_additions(self):
-        test_input = '2.5'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([FLOAT:2.5], None)'
-        self.assertEqual(str(testing), expected_text)
+TT_DEF      = 'FUNCTION'
+TT_WHILE    = 'WHILE'
+TT_IF       = 'IF'
 
-class TestTokens_Error(unittest.TestCase):
-    def test_additions(self):
-        test_input = 'string'
-        testing = Tokenizer.run(test_input)
-        expected_text = '([], <Tokenizer.IllegalCharError object at 0x000002405638BFA0>)'
-        self.assertEqual(str(testing), expected_text)
+#TOKEN CLASS#
+class Token:
+    def __init__(self, type_, value=None):
+        self.type = type_
+        self.value = value
 
-if __name__  == '__main__':
-    unittest.main()
+    def __repr__(self):
+        if self.value: return f'{self.type}:{self.value}'
+        return f'{self.type}'
 
+#LEXER CLASS#
+class Lexer:
+    def __init__(self, text):
+        self.text = text
+        self.pos = -1
+        self.current_char = None
+        self.advance()
 
+    def advance(self):
+        self.pos += 1
+        self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
 
-    
+    def make_tokens(self):
+        tokens = []
+
+        while self.current_char != None:
+            if self.current_char in ' \t':
+                self.advance()
+            elif self.current_char in DIGITS:
+                tokens.append(self.make_number())
+            elif self.current_char == '+':
+                tokens.append(Token(TT_PLUS))
+                self.advance()
+            elif self.current_char == '-':
+                tokens.append(Token(TT_MINUS))
+                self.advance()
+            elif self.current_char == '*':
+                tokens.append(Token(TT_MULTIPLY))
+                self.advance()
+            elif self.current_char == '/':
+                tokens.append(Token(TT_DIVIDE))
+                self.advance()
+            elif self.current_char == '(':
+                tokens.append(Token(TT_LPARAN))
+                self.advance()
+            elif self.current_char == ')':
+                tokens.append(Token(TT_RPARAN))
+                self.advance()
+            elif self.current_char == '{':
+                tokens.append(Token(TT_LCURLY))
+                self.advance()
+            elif self.current_char == '}':
+                tokens.append(Token(TT_RCURLY))
+                self.advance()
+            else:
+                char = self.current_char
+                self.advance()
+                return [], Error.IllegalCharError(char)
+
+        return tokens, None
+
+    def make_number(self):
+        num_str = ''
+        dot_count = 0
+
+        while self.current_char != None and self.current_char in DIGITS + '.':
+            if self.current_char == '.':
+                if dot_count == 1: break
+                dot_count += 1
+                num_str += '.'
+            else:
+                num_str += self.current_char
+            self.advance()
+
+        if dot_count == 0:
+            return Token(TT_INT, int(num_str))
+        else:
+            return Token(TT_FLOAT, float(num_str))
+
+#RUN CLASS#
+def run(text):
+    lexer = Lexer(text)
+    tokens, error = lexer.make_tokens()
+    if error: return None, error
+
+    parser = Parser.Parser(tokens)
+    ast = parser.parse()
+    return ast, None
