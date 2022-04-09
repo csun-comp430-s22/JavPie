@@ -1,39 +1,84 @@
-<<<<<<< HEAD
-####################################################################################
-####################################################################################
-############ Using test file in the src folder. Igonore for now ####################
-####################################################################################
-####################################################################################
-
-
-# from importlib import import_module
-# import unittest
-# import sys
-=======
 import unittest
-import Tokenizer
- 
+import sys
+
+sys.path.insert(0,'src')
+from Tokenizer import run
+
+default = '<stdin>'
+# # CURRENTLY WORKING ON IMPORTING FROM ANOTHER FILE
+# #
+# #  /../JAVPIE folder
+# #  |    |src folder
+# #  |         |-----. py - target
+# #  |
+# #  |----|Test folder
+# #  |         |-----./test_Tokenizer.py
+# #
+# #  Method works in Visual Studio Code, as this code was written using VSCode
+# #  SOLVED, run test file with Coding Environemnt First
+# #  Then, you can type: python .\test_Tokenizer.py
+# #  Into the terminal
+
 class TestTokens(unittest.TestCase):
-    def test_run(self):
-        test_input = '9+9'
-        expected_text = '[INT:9,PLUS,INT:9]'
-        self.assertEqual(Tokenizer.run(test_input), expected_text)
->>>>>>> 9d51997d7107a3aab74ca9df43054feed17bd60c
+    def test_additions(self):
+        test_input = '1+1'
+        testing = run(default, test_input)
+        expected_text = '((INT:1, PLUS, INT:1), None)'
+        self.assertEqual(str(testing), expected_text)
+        
+class TestTokens2(unittest.TestCase):
+    def test_NumParan(self):
+        test_input = '(3)'
+        testing = run(default, test_input)
+        expected_text = '((LPARAN, INT:3, RPARAN), None)'
+        self.assertEqual(str(testing), expected_text)
 
-# sys.path.append(1, '../')
-# from source.Tokenizer import Tokenizer as module
 
+class TestTokens3(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '{5}'
+        testing = run(test_input)
+        expected_text = '((LCURLY, INT:5, RCURLY), None)'
+        self.assertEqual(str(testing), expected_text)
 
+class TestTokens4(unittest.TestCase):
+    def test_Division(self):
+        test_input = '10/2'
+        testing = run(test_input)
+        expected_text = '((INT:10, DIVIDE, INT:2), None)'
+        self.assertEqual(str(testing), expected_text)
 
-# # NOT 100% SURE THIS TEST CASE WILL WORK TRYING TO GET IMPORT TO WORK FOR NOW
-# class TestTokens(unittest.TestCase):
-#     def test_additions(self):
-#         test_input = '9+9'
-#         expected_text = '[INT:9,PLUS,INT:9]'
-#         self.assertEqual(module.run(test_input), expected_text)
+class TestTokens5(unittest.TestCase):
+    def test_Multiply(self):
+        test_input = '10 * 2'
+        testing = run(test_input)
+        expected_text = '((INT:10, MULTIPLY, INT:2), None)'
+        self.assertEqual(str(testing), expected_text)
 
-# if __name__  == '__main__':
-#     unittest.main()
+class TestTokens6(unittest.TestCase):
+    def test_Operands(self):
+        test_input = '+-'
+        testing = run(test_input)
+        expected_text = '((PLUS, MINUS]) None)'
+        self.assertEqual(str(testing), expected_text)
+        
+class TestTokens7(unittest.TestCase):
+    def test_Decimal(self):
+        test_input = '2.5'
+        testing = run(default, test_input)
+        expected_text = '((FLOAT:2.5), None)'
+        self.assertEqual(str(testing), expected_text)
+
+class TestTokens_Error(unittest.TestCase):
+    def test_String(self):
+        test_input = 'string'
+        testing = run(default, test_input)
+        expected_text = '(None), <IllegalCharError object at 0x000002405638BFA0>)'
+        self.assertEqual(str(testing), expected_text)
+
+if __name__  == '__main__':
+    unittest.main()
+
 
 
     
