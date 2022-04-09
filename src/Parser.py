@@ -1,31 +1,13 @@
 import Error
 import Tokenizer
 
-
-#Erro Runtime
-
-class RTResult:
-    def __init__(self):
-        self.value = None
-        self.error = None
-
-    def register(self, res):
-        if res.error: self.error = res.error
-        return res.value
-
-    def success(self, value):
-        self.value = value
-        return self
-    def failure(self, error):
-        self.error = error
-        return self
-
-#NODE CLASS#
+#NODE CLASSES#
 class NumberNode:
     def __init__(self, tok):
         self.tok = tok
+
         self.pos_start = self.tok.pos_start
-        self.pos_end =self.tok.pos_end
+        self.pos_end = self.tok.pos_end
     
     def __repr__(self):
         return f'{self.tok}'
@@ -53,6 +35,7 @@ class UnaryOpNode:
 
     def __repr__(self):
         return f'({self.op_tok}, {self.node})'
+
 #PARSE RESULT#
 class ParseResult:
     def __init__(self):
@@ -148,18 +131,3 @@ class Parser:
             left = BinOpNode(left, op_tok, right)
 
         return res.success(left)
-
-    #def atom(self):
-      #  res = ParseResult()
-       # tok = self.current_tok
-
-        #if tok.type == Tokenizer.TT_STRING:
-         #   res.register_advancement()
-          #  self.advance()
-           # return res.success(Tokenizer.StringNode(tok))
-
-class Context: 
-    def __init__(self, display_name, parent = None, parent_entry_pos = None):
-        self.display_name = display_name
-        self.parent = parent
-        self.parent_entry_pos = parent_entry_pos

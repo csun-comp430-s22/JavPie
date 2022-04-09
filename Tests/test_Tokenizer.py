@@ -1,3 +1,4 @@
+from distutils.log import error
 import unittest
 import sys
 
@@ -22,43 +23,43 @@ default = '<stdin>'
 class TestTokens(unittest.TestCase):
     def test_additions(self):
         test_input = '1+1'
-        testing = run(default, test_input)
-        expected_text = '((INT:1, PLUS, INT:1), None)'
+        testing, error = run(default, test_input)
+        expected_text = '2'
         self.assertEqual(str(testing), expected_text)
         
 class TestTokens2(unittest.TestCase):
     def test_NumParan(self):
         test_input = '(3)'
-        testing = run(default, test_input)
-        expected_text = '((LPARAN, INT:3, RPARAN), None)'
+        testing, error = run(default, test_input)
+        expected_text = '3'
         self.assertEqual(str(testing), expected_text)
 
 
 class TestTokens3(unittest.TestCase):
     def test_NumCBrace(self):
-        test_input = '{5}'
-        testing = run(test_input)
-        expected_text = '((LCURLY, INT:5, RCURLY), None)'
-        self.assertEqual(str(testing), expected_text)
+        test_input = '\{5\}'
+        testing, error = run(default, test_input)
+        expected_text = "Illegal Character: '\\'"
+        self.assertEqual(error.as_string(), expected_text)
 
 class TestTokens4(unittest.TestCase):
     def test_Division(self):
         test_input = '10/2'
-        testing = run(test_input)
-        expected_text = '((INT:10, DIVIDE, INT:2), None)'
+        testing, error = run(default, test_input)
+        expected_text = '5'
         self.assertEqual(str(testing), expected_text)
 
 class TestTokens5(unittest.TestCase):
     def test_Multiply(self):
         test_input = '10 * 2'
-        testing = run(test_input)
-        expected_text = '((INT:10, MULTIPLY, INT:2), None)'
+        testing = run(default, test_input)
+        expected_text = '20'
         self.assertEqual(str(testing), expected_text)
 
 class TestTokens6(unittest.TestCase):
     def test_Operands(self):
         test_input = '+-'
-        testing = run(test_input)
+        testing = run(default, test_input)
         expected_text = '((PLUS, MINUS]) None)'
         self.assertEqual(str(testing), expected_text)
         
@@ -66,7 +67,7 @@ class TestTokens7(unittest.TestCase):
     def test_Decimal(self):
         test_input = '2.5'
         testing = run(default, test_input)
-        expected_text = '((FLOAT:2.5), None)'
+        expected_text = '2.5'
         self.assertEqual(str(testing), expected_text)
 
 class TestTokens_Error(unittest.TestCase):

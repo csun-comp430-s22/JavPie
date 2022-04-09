@@ -1,11 +1,8 @@
-#from Parser import Parser
-import Parser2
-
+import Tokenizer
 
 while True:
     text = input('Javpie > ')
-    result, error = Parser2.run('<stdin>', text)
+    result, error = Tokenizer.run('<stdin>', text)
 
     if error: print(error.as_string())
     else: print(result)
-
