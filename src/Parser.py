@@ -1,31 +1,13 @@
 import Error
 import Tokenizer
 
-
-#Erro Runtime
-
-class RTResult:
-    def __init__(self):
-        self.value = None
-        self.error = None
-
-    def register(self, res):
-        if res.error: self.error = res.error
-        return res.value
-
-    def success(self, value):
-        self.value = value
-        return self
-    def failure(self, error):
-        self.error = error
-        return self
-
-#NODE CLASS#
+#NODE CLASSES#
 class NumberNode:
     def __init__(self, tok):
         self.tok = tok
+
         self.pos_start = self.tok.pos_start
-        self.pos_end =self.tok.pos_end
+        self.pos_end = self.tok.pos_end
     
     def __repr__(self):
         return f'{self.tok}'

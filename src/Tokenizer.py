@@ -1,5 +1,3 @@
-from distutils.log import error
-from unittest import result
 import Error
 import Parser
 from strings_with_arrows import *
@@ -228,7 +226,7 @@ class Position:
 #TOKEN CLASS#
 class Token:
     def __init__(self, type_, value=None, pos_start=None, pos_end=None):
-        self.type = type_ 
+        self.type = type_
         self.value = value
 
         if pos_start:
@@ -243,8 +241,7 @@ class Token:
         return self.type == type_ and self.value == value
 
     def __repr__(self):
-        if self.value: return f'{self.type}:{self.value}' #if self has a value it is going to return the type, value and if it doesnt
-        #have a value then just the type
+        if self.value: return f'{self.type}:{self.value}'
         return f'{self.type}'
 
 #LEXER CLASS#
@@ -273,8 +270,6 @@ class Lexer:
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS, pos_start=self.pos))
                 self.advance()
-            elif self.current_char == '"':
-                tokens.append(self.make_string())
             elif self.current_char == '-':
                 tokens.append(Token(TT_MINUS, pos_start=self.pos))
                 self.advance()
@@ -340,32 +335,6 @@ class Lexer:
             
         tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
         return Token(tok_type, id_str, pos_start, self.pos)
-
-    def make_string(self):
-        string = ''
-        Error.pos_start = self.pos.copy()
-        escape_character = False
-        self.advance()
-
-        escape_characters = {
-            'n': '\n',
-            't': '\t'
-        }
-
-        while self.current_char != None and self.current_char != '"' or escape_character:
-            if escape_character:
-                string += escape_characters.get(self.current_char, self.current_char)
-            else:
-                if self.current_char == '\\':
-                    escape_character = True
-                else:
-                    string += self.current_char
-            self.advance()
-            escape_character = False
-
-        self.advance()
-        return Token(TT_STRING, string, Parser.pos_start, self.pos)
-
 
 #RUN CLASS#
 
