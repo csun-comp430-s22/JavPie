@@ -1,8 +1,7 @@
-from lib2to3.pgen2.tokenize import TokenError
 import unittest
 import Tokenizer
 
-# NOT 100% SURE THIS TEST CASE WILL WORK TRYING TO GET IMPORT TO WORK FOR NOW
+
 default = '<stdin>'
 
 class TestTokens(unittest.TestCase):

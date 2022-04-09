@@ -2,22 +2,28 @@ from distutils.log import error
 from unittest import result
 import Error
 import Parser
+from strings_with_arrows import *
 import string
 
 #CONSTANTS#
 DIGITS = '0123456789'
+LETTERS = string.ascii_letters
+LETTER_DIGITS = LETTERS + DIGITS
 
 #TOKENS#
-TT_INT      = 'INT'
-TT_FLOAT    = 'FLOAT'
-TT_STRING   = 'STRING'
+TT_INT          = 'INT'
+TT_FLOAT        = 'FLOAT'
+TT_STRING       = 'STRING'
+TT_IDENTIFIER   = 'IDENTIFIER'
+TT_KEYWORD      = 'KEYWORD'
 
 TT_VARIABLE = 'VARIABLE'
 
-TT_PLUS     = 'PLUS'
-TT_MINUS    = 'MINUS'
-TT_MULTIPLY = 'MULTIPLY'
-TT_DIVIDE   = 'DIVIDE'
+TT_PLUS      = 'PLUS'
+TT_MINUS     = 'MINUS'
+TT_MULTIPLY  = 'MULTIPLY'
+TT_DIVIDE    = 'DIVIDE'
+TT_EQ        = 'EQ'
 
 TT_LPAREN   = 'LPARAN'
 TT_RPAREN   = 'RPARAN'
@@ -29,6 +35,31 @@ TT_WHILE    = 'WHILE'
 TT_IF       = 'IF'
 
 TT_EOF      = 'EOF'
+TT_POW      = 'POW'
+
+KEYWORDS = {
+    'VAR'
+}
+
+#SYMBOL TABLE#
+
+class SymbolTable:
+    def __init__(self):
+        self.symbols = {}
+        self.parent = None
+        
+    def get(self, name):
+        value = self.symbols.get(name, None)
+        if value == None and self.parent:
+            return self.parent.get(name)
+        
+        return value
+    
+    def set(self, name, value):
+        self.symbols[name] = value
+        
+    def remove(self, name):
+        del self.symbols[name]
 
 #INTERPRETER#
 
@@ -44,11 +75,35 @@ class Interpreter:
     def visit_NumberNode(self,node, context):
         return Parser.RTResult().success(Number(node.tok.value).set_context(context).set_pos(node.pos_start, node.pos_end))
 
+    def Visit_VarAccessNode(self, node, context):
+        res = Parser.RTResult()
+        var_name = node.var_name_tok.value
+        value = context.symbol_table.get(var_name)
+        
+        if not value:
+            res.failure(Error.RTError(
+                node.pos_start, node.pos_end,
+                f"'{var_name}' is not defined",
+                  context
+            ))
+        value = value.copy().set_pos(node.pos_start, node.pos_end)
+        return res.success(value)
+    
+    def visit_VarAssignNode(self, node, context):
+        res = Parser.RTResult()
+        var_name = node.var_name_tok.value
+        value = res.register(self.visit(node.value_node, context))
+        if res.error: return res
+        
+        context.symbol_table.set(var_name, value)
+        return res.success(value)
+
+        
     def visit_BinOpNode(self, node, context):
         res = Parser.RTResult()
-        left =res.register(self.visit(node.left_node), context)
+        left = res.register(self.visit(node.left_node, context))
         if res.error: return res
-        right = res.register(self.visit(node.right_node), context)
+        right = res.register(self.visit(node.right_node, context))
 
         if node.op_tok.value == TT_PLUS:
             result, error = left.added_to(right)
@@ -58,6 +113,8 @@ class Interpreter:
             result, error = left.multed_by(right)
         elif node.op_tok.value == TT_DIVIDE:
             result,error = left.divided_by(right)
+        elif node.op_tok.value == TT_POW:
+            result,error = left.powed_by(right)
         
         if error: 
             return res.failure(error)
@@ -95,6 +152,7 @@ class Number:
     def set_context(self, context = None):
         self.context = context
         return self
+        
     def added_to(self, other):
         if isinstance(other, Number):
             return Number(self.value + other.value).set_context(self.context), None
@@ -115,6 +173,16 @@ class Number:
                     'Division by Zero >:(', self.context
                 )
             return Number(self.value / other.value).set_context(self.context), None
+
+    def powed_by(self, other):
+        if isinstance(other, Number):
+            return Number(self.value ** other.value).set_context(self.context), None
+    
+    def copy(self):
+        copy = Number(self.value)
+        copy.set_pos(self.set_pos, self.pos_end)
+        copy.set_context(self.context)
+        return copy
 
     def __repr__(self):
         return str(self.value)
@@ -156,6 +224,7 @@ class Position:
     def copy(self):
         return Position(self.idx, self.ln, self.col, self.fn, self.ftxt)
 
+
 #TOKEN CLASS#
 class Token:
     def __init__(self, type_, value=None, pos_start=None, pos_end=None):
@@ -169,6 +238,9 @@ class Token:
 
         if pos_end:
             self.pos_end = pos_end
+            
+    def matches(self, type_, value):
+        return self.type == type_ and self.value == value
 
     def __repr__(self):
         if self.value: return f'{self.type}:{self.value}' #if self has a value it is going to return the type, value and if it doesnt
@@ -196,6 +268,8 @@ class Lexer:
                 self.advance()
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
+            elif self.current_char in LETTERS:
+                tokens.append(self.make_identifier)
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS, pos_start=self.pos))
                 self.advance()
@@ -210,6 +284,9 @@ class Lexer:
             elif self.current_char == '/':
                 tokens.append(Token(TT_DIVIDE, pos_start=self.pos))
                 self.advance()
+            elif self.current_char == '^':
+                tokens.append(Token(TT_POW, pos_start=self.pos))
+                self.advance()
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
@@ -222,6 +299,9 @@ class Lexer:
             elif self.current_char == '}':
                 tokens.append(Token(TT_RCURLY, pos_start=self.pos))
                 self.advance()
+            elif self.current_char == '=':
+                tokens.append(Token(TT_EQ, pos_start=self.pos))
+                self.advance()                                              
             else:
                 pos_start = self.pos.copy()
                 char = self.current_char
@@ -249,6 +329,17 @@ class Lexer:
             return Token(TT_INT, int(num_str), pos_start, self.pos)
         else:
             return Token(TT_FLOAT, float(num_str))
+      
+    def make_identifier(self):
+        id_str = ''
+        pos_start = self.pos.copy()
+        
+        while self.current_char != None and self.current_char in LETTER_DIGITS + '_':
+            id_str += self.current_char
+            self.advance()
+            
+        tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
+        return Token(tok_type, id_str, pos_start, self.pos)
 
     def make_string(self):
         string = ''
@@ -277,16 +368,23 @@ class Lexer:
 
 
 #RUN CLASS#
+
+global_symbol_table = SymbolTable()
+global_symbol_table.set("null", Number(0))
+
 def run(fn, text):
     lexer = Lexer(fn, text)
     tokens, error = lexer.make_tokens()
     if error: return None, error
+    
     parser = Parser.Parser(tokens)
     ast = parser.parse()
     if ast.error: return None, ast.error
 
     interpreter = Interpreter()
     context = Parser.Context('<program>')
+    context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
+
     return result.value, result.error
   #  return ast.node, ast.error
