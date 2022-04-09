@@ -37,6 +37,7 @@ class Interpreter:
        method_name = f'visit_{type(node).__name__}'
        method = getattr(self, method_name, self.no_visit_method)
        return method(node, context)
+
     
     def no_visit_method(self, node, context):
         raise Exception(f'No vistit_{type(node).__name__} method defined')
@@ -45,24 +46,25 @@ class Interpreter:
         return Parser.RTResult().success(Number(node.tok.value).set_context(context).set_pos(node.pos_start, node.pos_end))
 
     def visit_BinOpNode(self, node, context):
-        res = Parser.RTResult()
-        left =res.register(self.visit(node.left_node), context)
-        if res.error: return res
-        right = res.register(self.visit(node.right_node), context)
+            res = Parser.RTResult()
+            left = res.register(self.visit(node.left_node, context))
+            if res.error: return res
+            right = res.register(self.visit(node.right_node, context))
+            if res.error: return res
 
-        if node.op_tok.value == TT_PLUS:
-            result, error = left.added_to(right)
-        elif node.op_tok.value == TT_MINUS:
-            result, error = left.subbed_by(right)
-        elif node.op_tok.value == TT_MULTIPLY:
-            result, error = left.multed_by(right)
-        elif node.op_tok.value == TT_DIVIDE:
-            result,error = left.divided_by(right)
-        
-        if error: 
-            return res.failure(error)
-        else:
-            return res.success(result.set_pos(node.pos_start, node.pos_end))
+            if node.op_tok.type == TT_PLUS:
+                result, error = left.added_to(right)
+            elif node.op_tok.type == TT_MINUS:
+                result, error = left.subbed_by(right)
+            elif node.op_tok.type == Parser.TT_MUL:
+                result, error = left.multed_by(right)
+            elif node.op_tok.type == Parser.TT_DIV:
+                result, error = left.dived_by(right)
+
+            if error:
+                return res.failure(error)
+            else:
+                return res.success(result.set_pos(node.pos_start, node.pos_end))
 
     
             
@@ -71,7 +73,7 @@ class Interpreter:
         number = res.register(self.visit(node.node), context)
         if res.error: return res
 
-        errpr = None
+        error = None
         if node.op_tok.type == TT_MINUS:
             number, error = number.multed_by(Number(-1))
         if error:
@@ -276,17 +278,21 @@ class Lexer:
         return Token(TT_STRING, string, Parser.pos_start, self.pos)
 
 
-#RUN CLASS#
+
 def run(fn, text):
+    # Generate tokens
     lexer = Lexer(fn, text)
     tokens, error = lexer.make_tokens()
     if error: return None, error
-    parser = Parser.Parser(tokens)
+        
+        # Generate AST
+    parser = Parser(tokens)
     ast = parser.parse()
     if ast.error: return None, ast.error
 
+        # Run program
     interpreter = Interpreter()
     context = Parser.Context('<program>')
     result = interpreter.visit(ast.node, context)
+
     return result.value, result.error
-  #  return ast.node, ast.error
