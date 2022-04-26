@@ -1,19 +1,9 @@
-#######################################
-# IMPORTS
-#######################################
-
 from strings_with_arrows import *
 
-#######################################
-# CONSTANTS
-#######################################
-
+# CONSTANTS #
 DIGITS = '0123456789'
 
-#######################################
-# ERRORS
-#######################################
-
+# ERRORS CLASS
 class Error:
 	def __init__(self, pos_start, pos_end, error_name, details):
 		self.pos_start = pos_start
@@ -58,10 +48,7 @@ class RTError(Error):
 
 		return 'Traceback (most recent call last):\n' + result
 
-#######################################
-# POSITION
-#######################################
-
+# POSITION CLASS
 class Position:
 	def __init__(self, idx, ln, col, fn, ftxt):
 		self.idx = idx
@@ -83,10 +70,7 @@ class Position:
 	def copy(self):
 		return Position(self.idx, self.ln, self.col, self.fn, self.ftxt)
 
-#######################################
-# TOKENS
-#######################################
-
+# TOKENS CLASS #
 TT_INT			= 'INT'
 TT_FLOAT    = 'FLOAT'
 TT_PLUS     = 'PLUS'
