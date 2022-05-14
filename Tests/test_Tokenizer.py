@@ -1,4 +1,3 @@
-from distutils.log import error
 import unittest
 import sys
 
@@ -60,7 +59,7 @@ class TestTokens6(unittest.TestCase):
     def test_Operands(self):
         test_input = '+-'
         testing = run(default, test_input)
-        expected_text = '((PLUS, MINUS]) None)'
+        expected_text = '((PLUS, MINUS) None)'
         self.assertEqual(str(testing), expected_text)
         
 class TestTokens7(unittest.TestCase):

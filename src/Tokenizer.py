@@ -1448,4 +1448,6 @@ def run(fn, text):
 	context.symbol_table = global_symbol_table
 	result = interpreter.visit(ast.node, context)
 
+	print(tokens)
+	print(ast.node)
 	return result.value, result.error
