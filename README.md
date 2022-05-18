@@ -10,6 +10,7 @@ How to Install Code Coverage in VSCode:
 
 
 How to run the test files
+
 Due to issues making test files work via terminal, tests would need to excecute by coding enviroments compila and run integrations.
 
 1. In Tests folder, open any test file and within coding environment compile and run the code. Do not use terminal
