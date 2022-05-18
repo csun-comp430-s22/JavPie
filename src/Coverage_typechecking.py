@@ -3,6 +3,7 @@
 #  THIS FILE IS FOR CODE COVERAGE, THIS IS
 #  NOT THE TEST FILE
 # 
+#
 import unittest
 import sys
 
@@ -199,7 +200,7 @@ class testFUN(unittest.TestCase):
         testing = Lexer(default, test_input).make_tokens()
         expected_res = '([KEYWORD:FUN, EOF], None)'
         self.assertEqual(str(testing), expected_res)
- 
+
 
 if __name__  == '__main__':
     unittest.main()
