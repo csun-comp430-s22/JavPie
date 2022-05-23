@@ -4,9 +4,8 @@ A Java-like compiler created in Python and Java as the target language.
 # Things to Install/Set Up Before Running JavPie
 1. Use the latest version of python from this website https://www.python.org/downloads/
 2. Install Visual Studio Code from this website https://code.visualstudio.com/Download
-    a. To allow git with VSCode go to settings, type 'git enabled' and make sure that options is checked
+2a. To allow git with VSCode go to settings, type 'git enabled' and make sure that options is checked
 3. to Clone a repository go to 'Source Control Option' and Select 'Clone Repository' then paste the repository link on the prompt VSCode provides
-
 
 
 # How to Install Code Coverage in VSCode:
