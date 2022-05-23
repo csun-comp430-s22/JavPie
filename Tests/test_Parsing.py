@@ -134,11 +134,53 @@ class testSTRMult(unittest.TestCase):
         parsetest = Parser(tokens).parse()
         expected_res = '(STRING:hello, MUL, INT:2)'
         self.assertEqual(str(parsetest.node), expected_res)
-
-
-
-
-# Not included in the test file or to be removed
+        
+class testSTRAdd(unittest.TestCase):
+    def test_Int(self):
+        test_input = '"hello" + " Comp430"'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(STRING:hello, PLUS, STRING: Comp430)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testSTRCombo(unittest.TestCase):
+    def test_Int(self):
+        test_input = '"hello" * 2 + " Comp430"'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '((STRING:hello, MUL, INT:2), PLUS, STRING: Comp430)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testParseError(unittest.TestCase):      
+    def test_ParseError(self):
+        test_input = '"hello" + 2'
+        test=False
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        if error != None: test = True
+        message = 'Test: Should Count as Illegal Expression'
+        self.assertTrue(test, message)
+        
+class testParseError1(unittest.TestCase):      
+    def test_ParseError(self):
+        test_input = '"hello" - 2'
+        test=False
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        if error != None: test = True
+        message = 'Test: Should Count as Illegal Expression'
+        self.assertTrue(test, message)
+        
+class testParseError3(unittest.TestCase):      
+    def test_ParseError(self):
+        test_input = '"hello" / 2'
+        test=False
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        if error != None: test = True
+        message = 'Test: Should Count as Illegal Expression'
+        self.assertTrue(test, message)
+        
 
 if __name__  == '__main__':
     unittest.main()

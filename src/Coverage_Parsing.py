@@ -11,196 +11,180 @@ sys.path.insert(0,'src')
 from Tokenizer import *
 
 default = '<stdin>'
-
 class testIntType(unittest.TestCase):
     def test_Int(self):
         test_input = '1'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([INT:1, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testAddNoSpaces(unittest.TestCase):
-    def test_add(self):
-        test_input = '1+9'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([INT:1, PLUS, INT:9, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testIntType(unittest.TestCase):
-    def test_String(self):
-        test_input = ''
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([INT:1, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testIntType(unittest.TestCase):
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = 'INT:1'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testFloatType(unittest.TestCase):
     def test_Int(self):
-        test_input = '1'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([INT:1, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testIntType(unittest.TestCase):
+        test_input = '1.1'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = 'FLOAT:1.1'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testAddition(unittest.TestCase):
     def test_Int(self):
-        test_input = '1'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([INT:1, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
+        test_input = '1+2'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(INT:1, PLUS, INT:2)'
+        self.assertEqual(str(parsetest.node), expected_res)
 
-class testEmptyInput(unittest.TestCase):
-    def test_String(self):
-        test_input = ''
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testIdentifierType(unittest.TestCase):
-    def test_Identifier(self):
-        test_input = 'VAR hi = 1'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:VAR, IDENTIFIER:hi, EQ, INT:1, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testLetterStringType(unittest.TestCase):
+class testMult(unittest.TestCase):
     def test_Int(self):
-        test_input = "h"
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([IDENTIFIER:h, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testFUNType(unittest.TestCase):
+        test_input = '10*22'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(INT:10, MUL, INT:22)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testMinus(unittest.TestCase):
     def test_Int(self):
-        test_input = 'FUN a (a,b) -> a + b'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:FUN, IDENTIFIER:a, LPAREN, IDENTIFIER:a, COMMA, IDENTIFIER:b, RPAREN, ARROW, IDENTIFIER:a, PLUS, IDENTIFIER:b, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testPlusSymbol(unittest.TestCase):
+        test_input = '30 - 20'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(INT:30, MINUS, INT:20)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testDivide(unittest.TestCase):
     def test_Int(self):
-        test_input = '+'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([PLUS, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testMinusSymbol(unittest.TestCase):
+        test_input = '10/5'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(INT:10, DIV, INT:5)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testMultParen(unittest.TestCase):
     def test_Int(self):
-        test_input = '-'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([MINUS, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testMultSymbol(unittest.TestCase):
+        test_input = '2*(3*2)'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(INT:2, MUL, (INT:3, MUL, INT:2))'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testAdditionParen(unittest.TestCase):
     def test_Int(self):
-        test_input = '*'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([MUL, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testDivideSymbol(unittest.TestCase):
+        test_input = '(2-1)+2'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '((INT:2, MINUS, INT:1), PLUS, INT:2)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testPower(unittest.TestCase):
     def test_Int(self):
-        test_input = '/'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([DIV, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testLParen(unittest.TestCase):
+        test_input = '2^2'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(INT:2, POW, INT:2)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testComplexMath(unittest.TestCase):
     def test_Int(self):
-        test_input = '('
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([LPAREN, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testRParen(unittest.TestCase):
+        test_input = '9*(2-1)+2'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '((INT:9, MUL, (INT:2, MINUS, INT:1)), PLUS, INT:2)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testComplexMath2(unittest.TestCase):
     def test_Int(self):
-        test_input = ')'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([RPAREN, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testPowSymbol(unittest.TestCase):
+        test_input = '(2-1)+2'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '((INT:2, MINUS, INT:1), PLUS, INT:2)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testComplexMath3(unittest.TestCase):
     def test_Int(self):
-        test_input = '^'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([POW, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testAND(unittest.TestCase):
+        test_input = '((2-1)+2)^2'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(((INT:2, MINUS, INT:1), PLUS, INT:2), POW, INT:2)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testComplexMath4(unittest.TestCase):
     def test_Int(self):
-        test_input = 'AND'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:AND, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
+        test_input = '10/2*2-1'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(((INT:10, DIV, INT:2), MUL, INT:2), MINUS, INT:1)'
+        self.assertEqual(str(parsetest.node), expected_res)
 
-class testVAR(unittest.TestCase):
+
+class testComplexMath3(unittest.TestCase):
     def test_Int(self):
-        test_input = 'VAR'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:VAR, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
+        test_input = '2^2+1-1*3/1'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(((INT:2, POW, INT:2), PLUS, INT:1), MINUS, ((INT:1, MUL, INT:3), DIV, INT:1))'
+        self.assertEqual(str(parsetest.node), expected_res)
 
-class testOR(unittest.TestCase):
+class testSTRType(unittest.TestCase):
     def test_Int(self):
-        test_input = 'OR'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:OR, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testIF(unittest.TestCase):
+        test_input = '"hello"'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = 'STRING:hello'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testSTRMult(unittest.TestCase):
     def test_Int(self):
-        test_input = 'IF'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:IF, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
+        test_input = '"hello" * 2'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(STRING:hello, MUL, INT:2)'
+        self.assertEqual(str(parsetest.node), expected_res)
 
-class testELSE(unittest.TestCase):
+class testSTRAdd(unittest.TestCase):
     def test_Int(self):
-        test_input = 'ELSE'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:ELSE, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testFOR(unittest.TestCase):
+        test_input = '"hello" + " Comp430"'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '(STRING:hello, PLUS, STRING: Comp430)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testSTRCombo(unittest.TestCase):
     def test_Int(self):
-        test_input = 'FOR'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:FOR, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testTO(unittest.TestCase):
-    def test_Int(self):
-        test_input = 'TO'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:TO, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testSTEP(unittest.TestCase):
-    def test_Int(self):
-        test_input = 'STEP'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:STEP, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testWHILE(unittest.TestCase):
-    def test_Int(self):
-        test_input = 'WHILE'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:WHILE, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testTHEN(unittest.TestCase):
-    def test_Int(self):
-        test_input = 'THEN'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:THEN, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
-class testFUN(unittest.TestCase):
-    def test_Int(self):
-        test_input = 'FUN'
-        testing = Lexer(default, test_input).make_tokens()
-        expected_res = '([KEYWORD:FUN, EOF], None)'
-        self.assertEqual(str(testing), expected_res)
-
+        test_input = '"hello" * 2 + " Comp430"'
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        expected_res = '((STRING:hello, MUL, INT:2), PLUS, STRING: Comp430)'
+        self.assertEqual(str(parsetest.node), expected_res)
+        
+class testParseError(unittest.TestCase):      
+    def test_ParseError(self):
+        test_input = '"hello" + 2'
+        test=False
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        if error != None: test = True
+        message = 'Test: Should Count as Illegal Expression'
+        self.assertTrue(test, message)
+        
+class testParseError1(unittest.TestCase):      
+    def test_ParseError(self):
+        test_input = '"hello" - 2'
+        test=False
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        if parsetest.error != None: test = True
+        message = 'Test: Should Count as Illegal Expression'
+        self.assertTrue(test, message)
+        
+class testParseError3(unittest.TestCase):      
+    def test_ParseError(self):
+        test_input = '"hello" / 2'
+        test=False
+        tokens, error = Lexer(default, test_input).make_tokens()
+        parsetest = Parser(tokens).parse()
+        if parsetest.error != None: test = True
+        message = 'Test: Should Count as Illegal Expression'
+        self.assertTrue(test, message)
 
 if __name__  == '__main__':
     unittest.main()
