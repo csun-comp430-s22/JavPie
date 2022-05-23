@@ -1,6 +1,18 @@
 import unittest
 import sys
 
+# # CURRENTLY WORKING ON IMPORTING FROM ANOTHER FILE
+# #
+# #  /../JAVPIE folder
+# #  |    |src folder
+# #  |         |-----. py - target
+# #  |
+# #  |----|Test folder
+# #  |         |-----./test_Tokenizer.py
+# #
+# #  Method works in Visual Studio Code, as this code was written using VSCode
+# #  SOLVED, run test file with Coding Environemnt
+# #  
 sys.path.insert(0,'src')
 from Tokenizer import *
 
@@ -158,7 +170,7 @@ class testParseError(unittest.TestCase):
         tokens, error = Lexer(default, test_input).make_tokens()
         parsetest = Parser(tokens).parse()
         if error != None: test = True
-        message = 'Test: Should Count as Illegal Expression'
+        message = 'Test: Should Count as Illegal Operation'
         self.assertTrue(test, message)
         
 class testParseError1(unittest.TestCase):      
@@ -168,7 +180,7 @@ class testParseError1(unittest.TestCase):
         tokens, error = Lexer(default, test_input).make_tokens()
         parsetest = Parser(tokens).parse()
         if error != None: test = True
-        message = 'Test: Should Count as Illegal Expression'
+        message = 'Test: Should Count as Illegal Operation'
         self.assertTrue(test, message)
         
 class testParseError3(unittest.TestCase):      
@@ -178,7 +190,7 @@ class testParseError3(unittest.TestCase):
         tokens, error = Lexer(default, test_input).make_tokens()
         parsetest = Parser(tokens).parse()
         if error != None: test = True
-        message = 'Test: Should Count as Illegal Expression'
+        message = 'Test: Should Count as Illegal Operation'
         self.assertTrue(test, message)
         
 
