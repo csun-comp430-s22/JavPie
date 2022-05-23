@@ -1,5 +1,4 @@
-from ast import Num
-from glob import escape
+from pprint import pprint
 from strings_with_arrows import *
 import string
 
@@ -1450,4 +1449,5 @@ def run(fn, text):
 
 	print(tokens)
 	print(ast.node)
+	pprint(type(ast.node))
 	return result.value, result.error

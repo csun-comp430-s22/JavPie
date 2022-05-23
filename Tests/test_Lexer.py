@@ -1,9 +1,8 @@
-from email.quoprimime import quote
 import unittest
 import sys
 
 sys.path.insert(0,'src')
-from Tokenizer import run
+##from Tokenizer import run
 from Tokenizer import *
 
 default = '<stdin>'
