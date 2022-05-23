@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0,'src')
 ##from Tokenizer import run
-from Tokenizer import *
+from JavPie import *
 
 default = '<stdin>'
 # # CURRENTLY WORKING ON IMPORTING FROM ANOTHER FILE

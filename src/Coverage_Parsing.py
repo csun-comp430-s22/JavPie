@@ -8,7 +8,7 @@ import unittest
 import sys
 
 sys.path.insert(0,'src')
-from Tokenizer import *
+from JavPie import *
 
 default = '<stdin>'
 class testIntType(unittest.TestCase):

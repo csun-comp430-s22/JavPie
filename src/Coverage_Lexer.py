@@ -1,5 +1,5 @@
 import unittest
-from Tokenizer import *
+from JavPie import *
 default = '<stdin>'
 
 class TestTokens(unittest.TestCase):

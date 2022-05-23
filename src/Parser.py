@@ -1,5 +1,5 @@
 import Error
-import Tokenizer
+import JavPie
 
 #NODE CLASSES#
 class NumberNode:
@@ -91,7 +91,7 @@ class Parser:
 
     def parse(self):
         res = self.expr()
-        if not res.error and self.current_tok.type != Tokenizer.TT_EOF:
+        if not res.error and self.current_tok.type != JavPie.TT_EOF:
             return res.failure(Error.InvalidSyntaxError( 
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected '+', '-', '*', or '/' \n"
@@ -102,22 +102,22 @@ class Parser:
         res = ParseResult()
         tok = self.current_tok
         
-        if tok.type in (Tokenizer.TT_INT, Tokenizer.TT_FLOAT):
+        if tok.type in (JavPie.TT_INT, JavPie.TT_FLOAT):
             res.register_advancement()
             self.advance()
             return res.success(NumberNode(tok))
         
-        elif tok.type == Tokenizer.TT_IDENTIFIER:
+        elif tok.type == JavPie.TT_IDENTIFIER:
             res.register_advancement()
             self.advance()
             return res.success(VarAccessNode(tok))
 
-        elif tok.type == Tokenizer.TT_LPAREN:
+        elif tok.type == JavPie.TT_LPAREN:
             res.register_advancement()
             self.advance()
             expr= res.register(self.expr())
             if res.error: return res
-            if self.current_tok.type == Tokenizer.TT_RPAREN:
+            if self.current_tok.type == JavPie.TT_RPAREN:
                 res.register_advancement()
                 self.advance()
                 return res.success(expr)
@@ -133,13 +133,13 @@ class Parser:
         ))
     
     def power(self):
-        return self.bin_op(self.atom, (Tokenizer.TT_POW, ), self.factor)
+        return self.bin_op(self.atom, (JavPie.TT_POW, ), self.factor)
         
     def factor(self):
         res = ParseResult()
         tok = self.current_tok
 
-        if tok.type in (Tokenizer.TT_PLUS, Tokenizer.TT_MINUS):
+        if tok.type in (JavPie.TT_PLUS, JavPie.TT_MINUS):
             res.register_advancement()
             self.advance()
             factor = res.register(self.factor())
@@ -153,15 +153,15 @@ class Parser:
         # ))
 
     def term(self):
-        return self.bin_op(self.factor, (Tokenizer.TT_MULTIPLY, Tokenizer.TT_DIVIDE))
+        return self.bin_op(self.factor, (JavPie.TT_MULTIPLY, JavPie.TT_DIVIDE))
 
     def expr(self):
         res = ParseResult()
         
-        if self.current_tok.matches(Tokenizer.TT_KEYWORD, 'VAR'):
+        if self.current_tok.matches(JavPie.TT_KEYWORD, 'VAR'):
             res.register_advancement()
             self.advance()
-            if self.current_tok.type != Tokenizer.TT_IDENTIFIER:
+            if self.current_tok.type != JavPie.TT_IDENTIFIER:
                 return res.failure(Error.InvalidSyntaxError(
                    self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected Identifier"
@@ -171,7 +171,7 @@ class Parser:
             res.register_advancement()
             self.advance()
             
-            if self.current_tok.type != Tokenizer.TT_EQ:
+            if self.current_tok.type != JavPie.TT_EQ:
                 return res.failure(Error.InvalidSyntaxError(
                    self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected '='"
@@ -183,7 +183,7 @@ class Parser:
             if res.error: return res
             return res.success(VarAssignNode(var_name, expr))
             
-        node = res.register(self.bin_op(self.term, (Tokenizer.TT_PLUS, Tokenizer.TT_MINUS)))
+        node = res.register(self.bin_op(self.term, (JavPie.TT_PLUS, JavPie.TT_MINUS)))
 
         if res.error: 
             return res.failure(Error.InvalidSyntaxError(

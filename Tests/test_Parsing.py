@@ -14,7 +14,7 @@ import sys
 # #  SOLVED, run test file with Coding Environemnt
 # #  
 sys.path.insert(0,'src')
-from Tokenizer import *
+from JavPie import *
 
 default = '<stdin>'
 

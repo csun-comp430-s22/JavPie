@@ -1,5 +1,5 @@
 from Error import RTError
-import Tokenizer
+import JavPie
 
 #RUNTIME RESULT#
 class RTResult:
@@ -77,13 +77,13 @@ class Interpreter:
         right = res.register(self.visit(node.right_node))
         if res.error: return res
 
-        if node.op_tok.type == Tokenizer.TT_PLUS:
+        if node.op_tok.type == JavPie.TT_PLUS:
             result, error = left.added_to(right)
-        elif node.op_tok.type == Tokenizer.TT_MINUS:
+        elif node.op_tok.type == JavPie.TT_MINUS:
             result, error = left.subbed_by(right)
-        elif node.op_tok.type == Tokenizer.TT_MULTIPLY:
+        elif node.op_tok.type == JavPie.TT_MULTIPLY:
             result, error = left.multed_by(right)
-        elif node.op_tok.type == Tokenizer.TT_DIVIDE:
+        elif node.op_tok.type == JavPie.TT_DIVIDE:
             result, error = left.dived_by(right)
 
         if error:
@@ -98,7 +98,7 @@ class Interpreter:
 
         error = None
 
-        if node.op_tok.type == Tokenizer.TT_MINUS:
+        if node.op_tok.type == JavPie.TT_MINUS:
             number, error = number.multed_by(Number(-1))
 
         if error:
