@@ -1,7 +1,5 @@
 import unittest
-import Tokenizer
-
-
+from Tokenizer import *
 default = '<stdin>'
 
 class TestTokens(unittest.TestCase):
