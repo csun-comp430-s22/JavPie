@@ -17,6 +17,7 @@ from JavPie import *
 ## or witout the use for external tools
 ## which are not included in this project,
 ## there will be no tests regarding type hinting.
+## This also applies for Code Coverage for the typechecker
 ##
 
 ##
