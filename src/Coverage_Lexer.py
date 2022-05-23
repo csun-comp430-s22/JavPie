@@ -7,73 +7,210 @@ default = '<stdin>'
 class TestTokens(unittest.TestCase):
     def test_additions(self):
         test_input = '1+1'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '((INT:1, PLUS, INT:1), None)'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_text = '([INT:1, PLUS, INT:1, EOF], None)'
         self.assertEqual(str(testing), expected_text)
-        
-class TestTokenNum(unittest.TestCase):
-    def test_Num(self):
-        test_input = '9'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '(INT:9, None)'
-        self.assertEqual(str(testing), expected_text)        
         
 class TestTokens2(unittest.TestCase):
     def test_NumParan(self):
         test_input = '(3)'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '((LPARAN, INT:3, RPARAN), None)'
+        testing= Lexer(default, test_input).make_tokens()
+        expected_text = '([LPAREN, INT:3, RPAREN, EOF], None)'
         self.assertEqual(str(testing), expected_text)
 
-
-class TestTokens3(unittest.TestCase):
-    def test_NumCBrace(self):
-        test_input = '{5}'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '((LCURLY, INT:5, RCURLY), None)'
-        self.assertEqual(str(testing), expected_text)
 
 class TestTokens4(unittest.TestCase):
     def test_Division(self):
         test_input = '10/2'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '((INT:10, DIVIDE, INT:2), None)'
+        testing= Lexer(default, test_input).make_tokens()
+        expected_text = '([INT:10, DIV, INT:2, EOF], None)'
         self.assertEqual(str(testing), expected_text)
 
 class TestTokens5(unittest.TestCase):
     def test_Multiply(self):
         test_input = '10 * 2'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '((INT:10, MULTIPLY, INT:2), None)'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_text = '([INT:10, MUL, INT:2, EOF], None)'
         self.assertEqual(str(testing), expected_text)
 
 class TestTokens6(unittest.TestCase):
     def test_Operands(self):
         test_input = '+-'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '((PLUS, MINUS), None)'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_text = '([PLUS, MINUS, EOF], None)'
         self.assertEqual(str(testing), expected_text)
         
 class TestTokens7(unittest.TestCase):
     def test_Decimal(self):
         test_input = '2.5'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '(FLOAT:2.5, None)'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_text = '([FLOAT:2.5, EOF], None)'
         self.assertEqual(str(testing), expected_text)
 
-class TestTokens_Error(unittest.TestCase):
+class TestTokens_String(unittest.TestCase):
     def test_String(self):
-        test_input = 'string'
-        testing = Tokenizer.run(default,test_input)
-        expected_text = '(None, <Tokenizer.IllegalCharError object at 0x000002405638BFA0>)'
+        test_input = '"string"'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_text = '([STRING:string, EOF], None)'
         self.assertEqual(str(testing), expected_text)
+        
+class testOR(unittest.TestCase):
+    def test_Int(self):
+        test_input = 'OR'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_res = '([KEYWORD:OR, EOF], None)'
+        self.assertEqual(str(testing), expected_res)
 
-class TestToken8(unittest.TestCase):
-    def test_SingleSpecial(self):
-        test_input = '('
-        testing = Tokenizer.run(default, test_input)
-        expected_Text = '(LParen, None)'
-        self.assertEqual(str(testing), expected_Text)
+class testIF(unittest.TestCase):
+    def test_Int(self):
+        test_input = 'IF'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_res = '([KEYWORD:IF, EOF], None)'
+        self.assertEqual(str(testing), expected_res)
+
+class testELSE(unittest.TestCase):
+    def test_Int(self):
+        test_input = 'ELSE'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_res = '([KEYWORD:ELSE, EOF], None)'
+        self.assertEqual(str(testing), expected_res)
+
+class testFOR(unittest.TestCase):
+    def test_Int(self):
+        test_input = 'FOR'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_res = '([KEYWORD:FOR, EOF], None)'
+        self.assertEqual(str(testing), expected_res)
+
+class testTO(unittest.TestCase):
+    def test_Int(self):
+        test_input = 'TO'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_res = '([KEYWORD:TO, EOF], None)'
+        self.assertEqual(str(testing), expected_res)
+
+class testSTEP(unittest.TestCase):
+    def test_Int(self):
+        test_input = 'STEP'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_res = '([KEYWORD:STEP, EOF], None)'
+        self.assertEqual(str(testing), expected_res)
+        
+class testFUN(unittest.TestCase):
+    def test_Int(self):
+        test_input = 'FUN'
+        testing = Lexer(default, test_input).make_tokens()
+        expected_res = '([KEYWORD:FUN, EOF], None)'
+        self.assertEqual(str(testing), expected_res)       
+        
+class TestTokensError(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '\{5\}'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: \ '
+        self.assertTrue(test, message)
+        
+class TestTokensError2(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '`'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: ` '
+        self.assertTrue(test, message)
+        
+class TestTokensError3(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = ' '
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: space_key'
+        self.assertTrue(test, message)
+        
+class TestTokensError4(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '@'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: @ '
+        self.assertTrue(test, message)
+        
+class TestTokensError5(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '#'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: # '
+        self.assertTrue(test, message)
+        
+class TestTokensError6(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '$'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: $ '
+        self.assertTrue(test, message)
+        
+class TestTokensError7(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '%'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: % '
+        self.assertTrue(test, message)
+        
+class TestTokensError8(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '~'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: ~ '
+        self.assertTrue(test, message)
+        
+class TestTokensError9(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = ';'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: ; '
+        self.assertTrue(test, message)        
+        
+        
+class TestTokensError4(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = ':'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: : '
+        self.assertTrue(test, message)
+        
+class TestTokensError4(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = ','
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: , '
+        self.assertTrue(test, message)
+        
+class TestTokensError4(unittest.TestCase):
+    def test_NumCBrace(self):
+        test_input = '.'
+        test=False
+        testing, error = Lexer(default, test_input).make_tokens()
+        if error != None: test = True
+        message = 'Test: Illegal Character: . '
+        self.assertTrue(test, message)
 
 if __name__  == '__main__':
     unittest.main()
