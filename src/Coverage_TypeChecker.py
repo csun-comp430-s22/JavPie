@@ -17,6 +17,8 @@ from Tokenizer import *
 ## or witout the use for external tools
 ## which are not included in this project,
 ## there will be no tests regarding type hinting.
+## 
+## This also Applies for Code Coverage
 ##
 
 ##
