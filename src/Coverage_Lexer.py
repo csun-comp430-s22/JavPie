@@ -1,3 +1,9 @@
+# 
+#
+#  THIS FILE IS FOR CODE COVERAGE, THIS IS
+#  NOT THE TEST FILE
+# 
+#
 import unittest
 from JavPie import *
 default = '<stdin>'
